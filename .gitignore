@@ -1,0 +1,25 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Logs and debugging
+*.log
+logs/
+
+# Model and output artifacts
+saved_model/
+model_plots/
+predictions/
+
+# Dataset files (optional, if too large)
+Dataset/
+
+# OS files
+.DS_Store
+Thumbs.db
