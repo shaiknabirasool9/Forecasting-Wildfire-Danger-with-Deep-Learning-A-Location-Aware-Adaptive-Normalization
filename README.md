@@ -52,4 +52,10 @@ Run training:
 python main.py
 ```
 
-If you want a Streamlit dashboard, add an `app.py` file and update this section accordingly.
+Run the Streamlit app:
+
+```bash
+streamlit run app.py
+```
+
+If the model file does not exist, run `python main.py` first to generate `saved_model/custom_model.h5`.
