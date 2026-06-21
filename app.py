@@ -1,6 +1,11 @@
 import os
 import streamlit as st
-import tensorflow as tf
+try:
+    import tensorflow as tf
+    TF_AVAILABLE = True
+except Exception:
+    tf = None
+    TF_AVAILABLE = False
 import numpy as np
 from PIL import Image
 
@@ -9,6 +14,8 @@ CLASS_NAMES = ["nowildfire", "wildfire"]
 
 @st.cache_resource
 def load_model(path):
+    if not TF_AVAILABLE:
+        return None
     if not os.path.exists(path):
         return None
     return tf.keras.models.load_model(path)
@@ -36,9 +43,15 @@ def main():
 
     model = load_model(MODEL_PATH)
     if model is None:
-        st.error(
-            f"Model file not found at `{MODEL_PATH}`. Run `python main.py` to train the model and save it."
-        )
+        if not TF_AVAILABLE:
+            st.warning(
+                "TensorFlow is not available in this deployment environment, so predictions are disabled. "
+                "To run predictions, run this app locally with TensorFlow installed or host the model and enable downloading."
+            )
+        else:
+            st.error(
+                f"Model file not found at `{MODEL_PATH}`. Run `python main.py` to train the model and save it."
+            )
         return
 
     uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
