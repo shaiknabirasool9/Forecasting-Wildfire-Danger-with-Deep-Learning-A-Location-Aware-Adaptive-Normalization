@@ -8,6 +8,10 @@ except Exception:
     TF_AVAILABLE = False
 import numpy as np
 from PIL import Image
+import requests
+
+# Optional model host URL (set as env var MODEL_URL)
+MODEL_URL = os.environ.get("MODEL_URL", "")
 
 MODEL_PATH = "saved_model/custom_model.h5"
 CLASS_NAMES = ["nowildfire", "wildfire"]
@@ -19,6 +23,28 @@ def load_model(path):
     if not os.path.exists(path):
         return None
     return tf.keras.models.load_model(path)
+
+
+def download_model(url: str, dest_path: str):
+    """Download a model file from `url` to `dest_path` if not exists."""
+    os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+    tmp_path = dest_path + ".part"
+    try:
+        with requests.get(url, stream=True, timeout=60) as r:
+            r.raise_for_status()
+            with open(tmp_path, "wb") as f:
+                for chunk in r.iter_content(chunk_size=8192):
+                    if chunk:
+                        f.write(chunk)
+        os.replace(tmp_path, dest_path)
+        return True
+    except Exception:
+        if os.path.exists(tmp_path):
+            try:
+                os.remove(tmp_path)
+            except Exception:
+                pass
+        return False
 
 
 def preprocess_image(image: Image.Image, target_size=(224, 224)):
